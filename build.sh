@@ -42,7 +42,7 @@ DEFCONFIGS="vendor/custom.config"
 
 
 # Download Toolchains
-[[ ! -d $workdir/clang ]] || exit 1
+[[ -d $workdir/clang ]] || exit 1
 
 # Clone binutils if they don't exist
 if ! ls $workdir/clang/bin | grep -q 'aarch64-linux-gnu'; then
