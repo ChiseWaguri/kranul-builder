@@ -19,7 +19,7 @@ jobs:
           sudo chmod a+rx /usr/local/bin/repo
       - name: Clone repos
         run: |
-          git clone  --depth==1 https://github.com/Pzqqt/android_kernel_xiaomi_marble ./common
+          git clone --depth=1 https://github.com/Pzqqt/android_kernel_xiaomi_marble ./common
           git clone https://gitlab.com/simonpunk/susfs4ksu -b gki-android12-5.10
           git clone https://github.com/ChiseWaguri/kernel-patches ./chise_patches
           git clone https://github.com/WildPlusKernel/kernel_patches ./wild_patches
