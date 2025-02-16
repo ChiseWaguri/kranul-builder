@@ -83,7 +83,7 @@ fi
 
 
 function m() {
-    make -j$(nproc --all) ARCH=arm64 LLVM=1 LLVM_IAS=1 O=$workdir/out CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- $@ || exit $?
+    make -j27 ARCH=arm64 LLVM=1 LLVM_IAS=1 O=$workdir/out CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- $@ || exit $?
 }
 
 
