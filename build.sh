@@ -42,36 +42,7 @@ DEFCONFIGS="vendor/custom.config"
 
 
 # Download Toolchains
-mkdir $workdir/clang
-if [[ $USE_AOSP_CLANG == "true" ]]; then
-    wget -qO $workdir/clang.tar.gz https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-$AOSP_CLANG_VERSION.tar.gz
-    tar -xf $workdir/clang.tar.gz -C $workdir/clang/
-    rm -f $workdir/clang.tar.gz
-elif [[ $USE_CUSTOM_CLANG == "true" ]]; then
-    if [[ $CUSTOM_CLANG_SOURCE =~ git ]]; then
-        if [[ $CUSTOM_CLANG_SOURCE == *'.tar.'* ]]; then
-            wget -qO $workdir/clang.tar.gz $CUSTOM_CLANG_SOURCE
-			tar -xf $workdir/clang.tar.gz -C $workdir/clang/
-            rm -f $workdir/*.tar.*
-        else
-            rm -rf $workdir/clang
-            git clone $CUSTOM_CLANG_SOURCE -b $CUSTOM_CLANG_BRANCH $workdir/clang --depth=1
-        fi
-	elif [[ $CUSTOM_CLANG_SOURCE == *'.tar.'* ]]; then
-            wget -qO $workdir/clang.tar.gz $CUSTOM_CLANG_SOURCE
-			tar -xf $workdir/clang.tar.gz -C $workdir/clang/
-            rm -f $workdir/*.tar.*
-    else
-        echo "Clang source other than git or tar file is not supported."
-        exit 1
-    fi
-elif [[ $USE_AOSP_CLANG == "true" ]] && [[ $USE_CUSTOM_CLANG == "true" ]]; then
-    echo "You have to choose one, AOSP Clang or Custom Clang!"
-    exit 1
-else
-    echo "stfu."
-    exit 1
-fi
+[[ ! -d $workdir/clang ]] || exit 1
 
 # Clone binutils if they don't exist
 if ! ls $workdir/clang/bin | grep -q 'aarch64-linux-gnu'; then
@@ -102,7 +73,9 @@ m ./scripts/kconfig/merge_config.sh $DEFCONFIGS
 scripts/config --file out/.config \
     --set-str LOCALVERSION "-Melt-Chise"
 
-$ONLY_DEFCONFIG && exit
+$ONLY_DEFCONFIG && (
+	cp out/.config $KERNEL_COPY_TO
+)
 
 echo -e "\nBuilding kernel...\n"
 m
