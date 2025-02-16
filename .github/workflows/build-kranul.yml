@@ -91,8 +91,14 @@ jobs:
         # with:
           # name: marble-kernel_${{ github.run_number }}
           # path: AnyKernel3/*
-      - name: Upload blobs artifact
+      - name: Upload kernel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel_${{ github.run_number }}
+          path: files/*
+      - name: Upload out artifact
         uses: actions/upload-artifact@v4
         with:
           name: blobs_${{ github.run_number }}
-          path: files/*
+          path: out/*
+

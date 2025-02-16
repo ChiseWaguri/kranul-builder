@@ -121,7 +121,7 @@ echo -e "\nKernel compiled succesfully!...\n"
 # VBOOT_DIR="AnyKernel3/vendor_boot_modules"
 # VDLKM_DIR="AnyKernel3/vendor_dlkm_modules"
 
-cp out/arch/arm64/boot/Image $KERNEL_COPY_TO
+cp $workdir/out/arch/arm64/boot/Image $KERNEL_COPY_TO
 echo "Copied kernel to $KERNEL_COPY_TO."
 
 # cd AnyKernel3
