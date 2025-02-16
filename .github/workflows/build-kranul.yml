@@ -14,6 +14,8 @@ jobs:
       - name: Setup build environment
         run: |
           sudo apt-get update
+          sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget curl lz4 zstd libarchive-tools -y
+          sudo aptitude install libssl-dev -y
           sudo apt-get install -y curl git ccache pngcrush schedtool maven lib32ncurses5-dev xsltproc libxml2-utils squashfs-tools lzop flex build-essential bc libssl-dev libswitch-perl libxml-simple-perl zip unzip g++-multilib bison gperf zlib1g-dev automake device-tree-compiler
           sudo curl --create-dirs -o /usr/local/bin/repo -L https://storage.googleapis.com/git-repo-downloads/repo
           sudo chmod a+rx /usr/local/bin/repo
