@@ -1,0 +1,82 @@
+name: build-kranul
+on:
+  workflow_dispatch:
+jobs:
+  build-ksu:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
+      #- name: Setup build environment
+      #  run: curl https://raw.githubusercontent.com/akhilnarang/scripts/master/setup/android_build_env.sh | bash -
+      - name: Setup build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl git ccache pngcrush schedtool maven lib32ncurses5-dev xsltproc libxml2-utils squashfs-tools lzop flex build-essential bc libssl-dev libswitch-perl libxml-simple-perl zip unzip g++-multilib bison gperf zlib1g-dev automake device-tree-compiler
+          sudo curl --create-dirs -o /usr/local/bin/repo -L https://storage.googleapis.com/git-repo-downloads/repo
+          sudo chmod a+rx /usr/local/bin/repo
+      - name: Clone repos
+        run: |
+          git clone  --depth==1 https://github.com/Pzqqt/android_kernel_xiaomi_marble ./common
+          git clone https://gitlab.com/simonpunk/susfs4ksu -b gki-android12-5.10
+          git clone https://github.com/ChiseWaguri/kernel-patches ./chise_patches
+          git clone https://github.com/WildPlusKernel/kernel_patches ./wild_patches
+      - name: Include RKSU
+        run: |
+          cd common
+          rmdir KernelSU || true
+          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s susfs-v1.5.5
+      - name: Include SUSFS
+        run: |
+          HOME="$(pwd)"
+          cp -r susfs4ksu/kernel_patches/* common
+          cd common/KernelSU
+          # patch -p1 < 10_enable_susfs_for_ksu.patch
+          cd ..
+          patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch || patch -p1 < $HOME/chise_patches/inode.c_fix.patch
+      - name: Include other KSU Next manager signatures
+        run: |
+          sed -i '/return (check_v2_signature(path, EXPECTED_SIZE, EXPECTED_HASH) ||/a\
+              check_v2_signature(path, 0x3e6, "79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7") /*KernelSU-Next*/ || \
+              \' KernelSU/kernel/apk_sign.c
+      - uses: actions/checkout@v4
+        with:
+          path: kranul-builder
+          fetch-depth: 0
+      - name: Build kernel
+        run: |
+          cp kranul-builder/build.sh common
+          cp kranul-builder/build-config.sh common
+          cp kranul-builder/kranul_config common/arch/arm64/configs
+          cd common
+          chmod +x build.sh
+          ./build.sh marble
+      # - name: Zip output
+        # run: |
+          # cp files/Image AnyKernel3
+          # cd AnyKernel3
+          # rm -r .git README.md
+          # find . -type f -name 'placeholder' -delete
+          # find . -type d -empty -delete
+          # zip -r9 "../marble-kernel.zip" *
+      # - name: Generate release tag
+        # id: tag
+        # run: echo "release_tag=Melt_$(date +'%Y.%m.%d')" >> "$GITHUB_OUTPUT"
+      # - name: Create Release
+        # uses: softprops/action-gh-release@v2
+        # with:
+          # tag_name: ${{ steps.tag.outputs.release_tag }}
+          # files: |
+            # kranul.zip
+      # - name: Upload marble-kernel artifact
+        # uses: actions/upload-artifact@v4
+        # with:
+          # name: marble-kernel_${{ github.run_number }}
+          # path: AnyKernel3/*
+      - name: Upload blobs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blobs_${{ github.run_number }}
+          path: files/*
