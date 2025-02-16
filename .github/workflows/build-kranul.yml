@@ -40,6 +40,9 @@ jobs:
               sed -i '/kernelsu/d' "$HOME/common/drivers/Makefile"
               rm -rf "$HOME/common/drivers/kernelsu"
           fi
+          if [ -d "$HOME/common/KernelSU" ]; then
+              rm -rf "$HOME/common/KernelSU"
+          fi
           curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s susfs-v1.5.5
       - name: Include SUSFS
         run: |
