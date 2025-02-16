@@ -20,9 +20,9 @@ jobs:
           sudo curl --create-dirs -o /usr/local/bin/repo -L https://storage.googleapis.com/git-repo-downloads/repo
           sudo chmod a+rx /usr/local/bin/repo
           sudo mkdir clang
-          wget -qO clang.tar.gz https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r547379.tar.gz
-          tar -xf clang.tar.gz -C clang/
-          rm -f clang.tar.gz
+          sudo wget -qO clang.tar.gz https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r547379.tar.gz
+          sudo tar -xf clang.tar.gz -C clang/
+          sudo rm -f clang.tar.gz
       - name: Clone repos
         run: |
           git clone --depth=1 https://github.com/Pzqqt/android_kernel_xiaomi_marble ./common
