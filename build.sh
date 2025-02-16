@@ -33,7 +33,13 @@ KERNEL_COPY_TO="$workdir/files"
 mkdir $KERNEL_COPY_TO
 
 DEFCONFIG="marble_defconfig"
-DEFCONFIGS="kranul_config"
+
+# DEFCONFIGS="vendor/waipio_GKI.config \
+# vendor/xiaomi_GKI.config \
+# vendor/personal.config \
+# vendor/debugfs.config"
+DEFCONFIGS="vendor/custom.config"
+
 
 # Download Toolchains
 mkdir $workdir/clang
@@ -84,7 +90,7 @@ function m() {
 echo -e "Generating config...\n"
 mkdir -p out
 m $DEFCONFIG
-m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
+m ./scripts/kconfig/merge_config.sh $DEFCONFIGS
 scripts/config --file out/.config \
     --set-str LOCALVERSION "-Melt-Chise"
 $DISABLE_LTO && (

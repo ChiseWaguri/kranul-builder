@@ -65,7 +65,7 @@ jobs:
         run: |
           cp kranul-builder/build.sh common
           cp kranul-builder/build-config.sh common
-          cp kranul-builder/kranul_config common/arch/arm64/configs
+          cp kranul-builder/custom.config common/arch/arm64/configs/vendor
           cd common
           chmod +x build.sh
           ./build.sh marble
