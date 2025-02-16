@@ -68,7 +68,7 @@ jobs:
           cp kranul-builder/custom.config common/arch/arm64/configs/vendor
           cd common
           chmod +x build.sh
-          ./build.sh marble
+          ./build.sh -d
       # - name: Zip output
         # run: |
           # cp files/Image AnyKernel3
@@ -100,5 +100,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blobs_${{ github.run_number }}
-          path: out/*
+          path: common/out/*
 

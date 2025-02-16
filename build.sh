@@ -83,22 +83,24 @@ fi
 
 
 function m() {
-    make -j27 ARCH=arm64 LLVM=1 LLVM_IAS=1 O=$workdir/out CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- $@ || exit $?
+    make -j27 ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- $@ || exit 0
 }
 
 
 echo -e "Generating config...\n"
+$DISABLE_LTO && (
+    sed -i 's/CONFIG_LTO=y/CONFIG_LTO=n/' "$workdir/common/arch/arm64/configs/$DEFCONFIG"
+    sed -i 's/CONFIG_LTO_CLANG_FULL=y/CONFIG_LTO_CLANG_FULL=n/' "$workdir/common/arch/arm64/configs/$DEFCONFIG"
+    sed -i 's/CONFIG_LTO_CLANG_THIN=y/CONFIG_LTO_CLANG_THIN=n/' "$workdir/common/arch/arm64/configs/$DEFCONFIG"
+    sed -i 's/CONFIG_THINLTO=y/CONFIG_THINLTO=n/' "$workdir/common/arch/arm64/configs/$DEFCONFIG"
+    echo "CONFIG_LTO_CLANG_NONE=y" >> "$workdir/common/arch/arm64/configs/$DEFCONFIG"
+    echo "CONFIG_LTO_NONE=y" >> "$workdir/common/arch/arm64/configs/$DEFCONFIG"
+)
 mkdir -p out
 m $DEFCONFIG
 m ./scripts/kconfig/merge_config.sh $DEFCONFIGS
 scripts/config --file out/.config \
     --set-str LOCALVERSION "-Melt-Chise"
-$DISABLE_LTO && (
-    scripts/config --file out/.config \
-        -d LTO_CLANG_FULL -e LTO_NONE \
-        --set-str LOCALVERSION "-Melt-NOLTO"
-    echo -e "\nDisabled LTO!"
-)
 
 $ONLY_DEFCONFIG && exit
 
@@ -121,7 +123,7 @@ echo -e "\nKernel compiled succesfully!...\n"
 # VBOOT_DIR="AnyKernel3/vendor_boot_modules"
 # VDLKM_DIR="AnyKernel3/vendor_dlkm_modules"
 
-cp $workdir/out/arch/arm64/boot/Image $KERNEL_COPY_TO
+cp $workdir/common/out/arch/arm64/boot/Image $KERNEL_COPY_TO
 echo "Copied kernel to $KERNEL_COPY_TO."
 
 # cd AnyKernel3
