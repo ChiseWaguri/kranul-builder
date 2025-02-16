@@ -40,13 +40,12 @@ jobs:
               sed -i '/kernelsu/d' "$HOME/common/drivers/Makefile"
               rm -rf "$HOME/common/drivers/kernelsu"
           fi
-          cd $HOME
           curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s susfs-v1.5.5
       - name: Include SUSFS
         run: |
           HOME="$(pwd)"
           cp -r susfs4ksu/kernel_patches/* common
-          cd KernelSU
+          cd common/KernelSU
           # patch -p1 < 10_enable_susfs_for_ksu.patch
           cd ..
           patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch || patch -p1 < $HOME/chise_patches/inode.c_fix.patch
@@ -54,7 +53,7 @@ jobs:
         run: |
           sed -i '/return (check_v2_signature(path, EXPECTED_SIZE, EXPECTED_HASH) ||/a\
               check_v2_signature(path, 0x3e6, "79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7") /*KernelSU-Next*/ || \
-              \' KernelSU/kernel/apk_sign.c
+              \' common/KernelSU/kernel/apk_sign.c
       - uses: actions/checkout@v4
         with:
           path: kranul-builder
